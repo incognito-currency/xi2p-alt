@@ -1,14 +1,14 @@
 SYS := $(shell $(CXX) -dumpmachine)
-SHLIB := libi2pd.so
-ARLIB := libi2pd.a
-SHLIB_CLIENT := libi2pdclient.so
-ARLIB_CLIENT := libi2pdclient.a
+SHLIB := libxi2p.so
+ARLIB := libxi2p.a
+SHLIB_CLIENT := libxi2pclient.so
+ARLIB_CLIENT := libxi2pclient.a
 I2PD := i2pd
 GREP := grep
 DEPS := obj/make.dep
 
-LIB_SRC_DIR := libi2pd
-LIB_CLIENT_SRC_DIR := libi2pd_client
+LIB_SRC_DIR := libxi2p
+LIB_CLIENT_SRC_DIR := libxi2p_client
 DAEMON_SRC_DIR := daemon
 
 include filelist.mk

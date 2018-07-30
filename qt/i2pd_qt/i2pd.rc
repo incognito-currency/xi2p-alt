@@ -1,7 +1,7 @@
 IDI_ICON1 ICON DISCARDABLE "resources/icons/mask.ico"
 
 #include <windows.h>             // needed for VERSIONINFO
-#include "../../libi2pd/version.h"
+#include "../../libxi2p/version.h"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     I2PD_VERSION_MAJOR,I2PD_VERSION_MINOR,I2PD_VERSION_MICRO,I2PD_VERSION_PATCH

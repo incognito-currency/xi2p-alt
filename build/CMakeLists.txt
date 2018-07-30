@@ -30,8 +30,8 @@ set ( CMAKE_SOURCE_DIR ".." )
 include(TargetArch)
 target_architecture(ARCHITECTURE)
 
-set(LIBI2PD_SRC_DIR ../libi2pd)
-set(LIBI2PD_CLIENT_SRC_DIR ../libi2pd_client)
+set(LIBI2PD_SRC_DIR ../libxi2p)
+set(LIBI2PD_CLIENT_SRC_DIR ../libxi2p_client)
 
 include_directories(${LIBI2PD_SRC_DIR})
 include_directories(${LIBI2PD_CLIENT_SRC_DIR})
@@ -96,18 +96,18 @@ if (WITH_I2LUA)
   add_definitions(-DI2LUA)
 endif()
 
-add_library(libi2pd ${LIBI2PD_SRC})
-set_target_properties(libi2pd PROPERTIES PREFIX "")
+add_library(libxi2p ${LIBI2PD_SRC})
+set_target_properties(libxi2p PROPERTIES PREFIX "")
 
 if (WITH_LIBRARY)
-  install(TARGETS libi2pd
-    EXPORT libi2pd
+  install(TARGETS libxi2p
+    EXPORT libxi2p
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     COMPONENT Libraries)
-# TODO Make libi2pd available to 3rd party projects via CMake as imported target
+# TODO Make libxi2p available to 3rd party projects via CMake as imported target
 # FIXME This pulls stdafx
-# install(EXPORT libi2pd DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# install(EXPORT libxi2p DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 set (CLIENT_SRC
@@ -128,12 +128,12 @@ if(WITH_WEBSOCKETS)
   list (APPEND CLIENT_SRC "${LIBI2PD_CLIENT_SRC_DIR}/Websocket.cpp")
 endif ()
 
-add_library(libi2pdclient ${CLIENT_SRC})
-set_target_properties(libi2pdclient PROPERTIES PREFIX "")
+add_library(libxi2pclient ${CLIENT_SRC})
+set_target_properties(libxi2pclient PROPERTIES PREFIX "")
 
 if (WITH_LIBRARY)
-  install(TARGETS libi2pdclient
-    EXPORT libi2pdclient
+  install(TARGETS libxi2pclient
+    EXPORT libxi2pclient
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     COMPONENT Libraries)
@@ -316,27 +316,27 @@ if (WITH_PCH)
   if(MSVC)
     target_compile_options(stdafx PRIVATE /Ycstdafx.h /Zm155)
     add_custom_command(TARGET stdafx POST_BUILD
-      COMMAND xcopy /y stdafx.dir\\$<CONFIG>\\*.pdb libi2pd.dir\\$<CONFIG>\\
+      COMMAND xcopy /y stdafx.dir\\$<CONFIG>\\*.pdb libxi2p.dir\\$<CONFIG>\\
       COMMAND xcopy /y stdafx.dir\\$<CONFIG>\\*.pdb i2pdclient.dir\\$<CONFIG>\\
       COMMAND xcopy /y stdafx.dir\\$<CONFIG>\\*.pdb i2pd.dir\\$<CONFIG>\\
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       )
-    target_compile_options(libi2pd PRIVATE /FIstdafx.h /Yustdafx.h /Zm155 "/Fp${CMAKE_BINARY_DIR}/stdafx.dir/$<CONFIG>/stdafx.pch")
-    target_compile_options(libi2pdclient PRIVATE /FIstdafx.h /Yustdafx.h /Zm155 "/Fp${CMAKE_BINARY_DIR}/stdafx.dir/$<CONFIG>/stdafx.pch")
+    target_compile_options(libxi2p PRIVATE /FIstdafx.h /Yustdafx.h /Zm155 "/Fp${CMAKE_BINARY_DIR}/stdafx.dir/$<CONFIG>/stdafx.pch")
+    target_compile_options(libxi2pclient PRIVATE /FIstdafx.h /Yustdafx.h /Zm155 "/Fp${CMAKE_BINARY_DIR}/stdafx.dir/$<CONFIG>/stdafx.pch")
   else()
     string(TOUPPER ${CMAKE_BUILD_TYPE} BTU)
     get_directory_property(DEFS DEFINITIONS)
     string(REPLACE " " ";" FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BTU}} ${DEFS}")
     add_custom_command(TARGET stdafx PRE_BUILD
-      COMMAND ${CMAKE_CXX_COMPILER} ${FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/../libi2pd/stdafx.h -o ${CMAKE_BINARY_DIR}/stdafx.h.gch
+      COMMAND ${CMAKE_CXX_COMPILER} ${FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/../libxi2p/stdafx.h -o ${CMAKE_BINARY_DIR}/stdafx.h.gch
     )
-    target_compile_options(libi2pd PRIVATE -include libi2pd/stdafx.h)
-    target_compile_options(libi2pdclient PRIVATE -include libi2pd/stdafx.h)
+    target_compile_options(libxi2p PRIVATE -include libxi2p/stdafx.h)
+    target_compile_options(libxi2pclient PRIVATE -include libxi2p/stdafx.h)
   endif()
-  target_link_libraries(libi2pd stdafx)
+  target_link_libraries(libxi2p stdafx)
 endif()
 
-target_link_libraries(libi2pdclient libi2pd)
+target_link_libraries(libxi2pclient libxi2p)
 
 find_package ( Boost COMPONENTS system filesystem program_options date_time REQUIRED )
 if(NOT DEFINED Boost_INCLUDE_DIRS)
@@ -375,7 +375,7 @@ if (NOT ZLIB_FOUND )
   if (WITH_PCH)
     add_dependencies( stdafx zlib-project )
   else ()
-    add_dependencies( libi2pd zlib-project )
+    add_dependencies( libxi2p zlib-project )
   endif ()
   # ExternalProject_Get_Property(zlib-project install_dir)
   set ( ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/zlib/include" CACHE FILEPATH "zlib include dir" FORCE)
@@ -445,7 +445,7 @@ if (WITH_BINARY)
     if (MSVC)
       target_compile_options("${PROJECT_NAME}" PRIVATE /FIstdafx.h /Yustdafx.h /Zm155 "/Fp${CMAKE_BINARY_DIR}/stdafx.dir/$<CONFIG>/stdafx.pch")
     else()
-      target_compile_options("${PROJECT_NAME}" PRIVATE -include libi2pd/stdafx.h)
+      target_compile_options("${PROJECT_NAME}" PRIVATE -include libxi2p/stdafx.h)
     endif()
   endif()
 
@@ -469,7 +469,7 @@ if (WITH_BINARY)
   if (WITH_STATIC)
     set(DL_LIB ${CMAKE_DL_LIBS})
   endif()
-  target_link_libraries( "${PROJECT_NAME}" libi2pd libi2pdclient ${DL_LIB} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${ZLIB_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${MINGW_EXTRA} ${DL_LIB} ${CMAKE_REQUIRED_LIBRARIES})
+  target_link_libraries( "${PROJECT_NAME}" libxi2p libxi2pclient ${DL_LIB} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${ZLIB_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${MINGW_EXTRA} ${DL_LIB} ${CMAKE_REQUIRED_LIBRARIES})
 
   install(TARGETS "${PROJECT_NAME}" RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
   set (APPS "\${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
@@ -496,7 +496,7 @@ install(FILES "C:/projects/openssl-$ENV{OPENSSL}/LICENSE"
   OPTIONAL                      # for local builds only!
   )
 
-file(GLOB_RECURSE I2PD_SOURCES "../libi2pd/*.cpp" "../libi2pd_client/*.cpp" "../daemon/*.cpp" "../build" "../Win32" "../Makefile*")
+file(GLOB_RECURSE I2PD_SOURCES "../libxi2p/*.cpp" "../libxi2p_client/*.cpp" "../daemon/*.cpp" "../build" "../Win32" "../Makefile*")
 install(FILES ${I2PD_SOURCES} DESTINATION src/ COMPONENT Source)
 # install(DIRECTORY ../ DESTINATION src/
 #   # OPTIONAL
@@ -505,7 +505,7 @@ install(FILES ${I2PD_SOURCES} DESTINATION src/ COMPONENT Source)
 #   PATTERN "*.cpp"
 #   )
 
-file(GLOB I2PD_HEADERS "../libi2pd/*.h" "../libi2pd_client/*.h" "../daemon/*.h")
+file(GLOB I2PD_HEADERS "../libxi2p/*.h" "../libxi2p_client/*.h" "../daemon/*.h")
 install(FILES ${I2PD_HEADERS} DESTINATION src/ COMPONENT Headers)
 # install(DIRECTORY ../ DESTINATION src/
 #   # OPTIONAL
@@ -518,7 +518,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Purple I2P, a C++ I2P daemon")
 set(CPACK_PACKAGE_VENDOR "Purple I2P")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE")
-file(READ ../libi2pd/version.h version_h)
+file(READ ../libxi2p/version.h version_h)
 string(REGEX REPLACE ".*I2PD_VERSION_MAJOR ([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_MAJOR "${version_h}")
 string(REGEX REPLACE ".*I2PD_VERSION_MINOR ([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_MINOR "${version_h}")
 string(REGEX REPLACE ".*I2PD_VERSION_MICRO ([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_MICRO "${version_h}")

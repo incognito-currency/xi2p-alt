@@ -3,11 +3,11 @@
 router.info
 router.keys
 i2p
-libi2pd.so
+libxi2p.so
 netDb
 /i2pd
-/libi2pd.a
-/libi2pdclient.a
+/libxi2p.a
+/libxi2pclient.a
 *.exe
 
 
