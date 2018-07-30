@@ -3,7 +3,7 @@ SHLIB := libxi2p.so
 ARLIB := libxi2p.a
 SHLIB_CLIENT := libxi2pclient.so
 ARLIB_CLIENT := libxi2pclient.a
-I2PD := i2pd
+I2PD := xi2p
 GREP := grep
 DEPS := obj/make.dep
 
@@ -18,7 +18,7 @@ USE_AVX		:= yes
 USE_STATIC	:= no
 USE_MESHNET	:= no
 USE_UPNP	:= no
-DEBUG		:= yes
+DEBUG		:= no
 
 ifeq ($(DEBUG),yes)
 	CXX_DEBUG = -g
